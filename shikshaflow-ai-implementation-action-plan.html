@@ -1,0 +1,655 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShikshaFlow AI — Implementation Action Plan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 32px 16px 48px;
+  }
+  .page { max-width: 760px; margin: 0 auto; }
+
+  /* Header */
+  .header { margin-bottom: 32px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #1f2328; letter-spacing: -0.3px; }
+  .header p { color: #57606a; font-size: 13px; margin-top: 6px; }
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tag {
+    background: #f7f8fa; border: 1px solid #e5e7eb;
+    border-radius: 4px; padding: 2px 10px; font-size: 12px; color: #57606a;
+  }
+  .tag.accent { background: #eff6ff; border-color: #bfdbfe; color: #3b82d4; }
+
+  /* Section headings */
+  h2 {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.6px; color: #57606a; margin: 32px 0 12px;
+    padding-bottom: 6px; border-bottom: 1px solid #e5e7eb;
+  }
+
+  /* Core user flow */
+  .flow-box {
+    background: #f7f8fa; border: 1px solid #e5e7eb;
+    border-radius: 6px; padding: 16px 20px; margin-bottom: 24px;
+  }
+  .flow-chain {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 12.5px;
+  }
+  .flow-chain .step {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 4px;
+    padding: 3px 10px; white-space: nowrap; color: #1f2328;
+  }
+  .flow-chain .arrow { color: #57606a; font-size: 11px; }
+
+  /* Stack */
+  .stack-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .stack-card {
+    background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .stack-card .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #57606a; margin-bottom: 6px; }
+  .stack-card ul { list-style: none; }
+  .stack-card ul li { font-size: 12.5px; color: #1f2328; padding: 2px 0; }
+  .stack-card ul li::before { content: "→ "; color: #3b82d4; font-weight: 700; }
+
+  /* Phase table */
+  .phase-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; font-size: 13px; }
+  .phase-table thead tr { background: #f7f8fa; }
+  .phase-table th {
+    text-align: left; padding: 8px 12px; font-size: 11.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; color: #57606a;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  .phase-table td { padding: 8px 12px; border-bottom: 1px solid #f0f1f3; vertical-align: top; }
+  .phase-table tr:last-child td { border-bottom: none; }
+  .phase-num {
+    display: inline-block; width: 26px; height: 26px; border-radius: 50%;
+    text-align: center; line-height: 26px; font-size: 11px; font-weight: 700;
+    background: #f7f8fa; border: 1px solid #e5e7eb; color: #57606a;
+  }
+  .phase-num.ai { background: #f3f0ff; border-color: #ddd6fe; color: #7c5cd8; }
+  .phase-num.core { background: #eff6ff; border-color: #bfdbfe; color: #3b82d4; }
+  .phase-num.infra { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+  .phase-name { font-weight: 600; color: #1f2328; }
+  .phase-desc { color: #57606a; font-size: 12.5px; margin-top: 2px; }
+  .badge {
+    display: inline-block; font-size: 10.5px; padding: 1px 7px; border-radius: 3px;
+    font-weight: 600; vertical-align: middle; margin-left: 6px;
+  }
+  .badge.foundation { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .badge.core { background: #eff6ff; color: #3b82d4; border: 1px solid #bfdbfe; }
+  .badge.ai { background: #f3f0ff; color: #7c5cd8; border: 1px solid #ddd6fe; }
+  .badge.deploy { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+
+  /* Data model */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .model-card {
+    background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px 14px;
+  }
+  .model-card .name { font-size: 12px; font-weight: 700; color: #1f2328; margin-bottom: 4px; }
+  .model-card .fields { font-size: 11.5px; color: #57606a; }
+  .model-card .fields span { display: inline-block; background: #fff; border: 1px solid #e5e7eb; border-radius: 3px; padding: 1px 6px; margin: 2px 2px 0 0; }
+
+  /* Agent architecture */
+  .agent-box {
+    background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 18px 20px; margin-bottom: 24px; font-family: "Segoe UI", monospace; font-size: 12.5px;
+  }
+  .agent-root { text-align: center; margin-bottom: 12px; }
+  .agent-root .node {
+    display: inline-block; background: #1f2328; color: #fff;
+    padding: 6px 18px; border-radius: 6px; font-weight: 700; font-size: 13px;
+  }
+  .agent-tier { display: flex; justify-content: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+  .agent-node {
+    background: #fff; border: 1.5px solid #3b82d4; border-radius: 6px;
+    padding: 8px 14px; text-align: center; font-size: 12px; color: #1f2328;
+    min-width: 120px;
+  }
+  .agent-node.purple { border-color: #7c5cd8; }
+  .agent-node.green { border-color: #16a34a; }
+  .vert-line { display: flex; justify-content: center; color: #57606a; font-size: 16px; line-height: 1; margin: 2px 0; }
+
+  /* Role summary */
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .role-card { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 16px; }
+  .role-card .role-title { font-weight: 700; font-size: 13px; margin-bottom: 8px; color: #1f2328; }
+  .role-card .role-title span { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 3px; margin-left: 6px; }
+  .role-card.teacher .role-title span { background: #eff6ff; color: #3b82d4; border: 1px solid #bfdbfe; }
+  .role-card.student .role-title span { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .role-card ul { list-style: none; }
+  .role-card ul li { font-size: 12.5px; padding: 2px 0; color: #57606a; }
+  .role-card ul li::before { content: "✓ "; color: #3b82d4; font-weight: 700; }
+  .role-card.student ul li::before { color: #16a34a; }
+
+  /* Key workflows */
+  .workflow-block { margin-bottom: 20px; }
+  .workflow-block .wf-title { font-weight: 700; font-size: 13px; color: #1f2328; margin-bottom: 8px; }
+  .wf-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .wf-steps .ws {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 4px;
+    padding: 4px 10px; font-size: 12px; color: #1f2328;
+  }
+  .wf-steps .wa { color: #57606a; font-size: 11px; }
+  .wf-steps .ws.ai { border-color: #ddd6fe; background: #f3f0ff; color: #7c5cd8; }
+  .wf-steps .ws.highlight { border-color: #bfdbfe; background: #eff6ff; color: #3b82d4; }
+
+  /* Priority callout */
+  .callout {
+    border-left: 3px solid #3b82d4; background: #f7f9ff;
+    padding: 12px 16px; border-radius: 0 6px 6px 0; margin-bottom: 16px;
+    font-size: 13px; color: #1f2328;
+  }
+  .callout strong { color: #3b82d4; }
+  .callout.purple { border-color: #7c5cd8; background: #faf8ff; }
+  .callout.purple strong { color: #7c5cd8; }
+  .callout.green { border-color: #16a34a; background: #f8fff9; }
+  .callout.green strong { color: #16a34a; }
+
+  /* Footer */
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #57606a; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  
+  <div class="header">
+    <h1>ShikshaFlow AI — Implementation Action Plan</h1>
+    <p>Sequential 21-phase build plan. One working layer at a time. IBM Bob execution ready.</p>
+    <div class="tag-row">
+      <span class="tag accent">React + FastAPI</span>
+      <span class="tag accent">IBM Granite</span>
+      <span class="tag">21 Phases</span>
+      <span class="tag">3 Roles</span>
+      <span class="tag">4 AI Agents</span>
+      <span class="tag">Teacher → Class → Student Loop</span>
+    </div>
+  </div>
+
+  
+  <div class="callout">
+    <strong>Core Loop:</strong> Teacher → Class → Students → Tasks / Assessments → Performance → AI Insights → Recommendations → Teacher Intervention → Improved Performance
+  </div>
+
+  
+  <h2>Technology Stack</h2>
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="label">Frontend</div>
+      <ul>
+        <li>React</li>
+        <li>React Router</li>
+        <li>Axios / Fetch</li>
+        <li>Context / Zustand</li>
+        <li>Tailwind CSS</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="label">Backend</div>
+      <ul>
+        <li>FastAPI (Python)</li>
+        <li>SQLAlchemy ORM</li>
+        <li>Pydantic Schemas</li>
+        <li>JWT Authentication</li>
+        <li>Alembic Migrations</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="label">AI / Data</div>
+      <ul>
+        <li>IBM Granite LLM</li>
+        <li>PostgreSQL / SQLite</li>
+        <li>IBM watsonx.ai SDK</li>
+        <li>IBM SkillsBuild</li>
+        <li>OER Resources</li>
+      </ul>
+    </div>
+  </div>
+
+  
+  <h2>Project Structure</h2>
+  <div class="flow-box" style="font-family:'Courier New', monospace;font-size:12.5px;color:#1f2328;line-height:2">
+    <span style="color:#3b82d4;font-weight:700">shikshaflow-ai/</span><br />
+      <span style="color:#16a34a">frontend/</span>      ← React app, pages, components, hooks<br />
+      <span style="color:#3b82d4">backend/</span>      ← FastAPI, routers, models, schemas, services<br />
+      <span style="color:#7c5cd8">ai/</span>          ← IBM Granite agents, prompts, chains<br />
+      <span style="color:#c2410c">database/</span>     ← Migrations, seed data<br />
+      <span style="color:#57606a">tests/</span>        ← Unit, integration, AI tests<br />
+      <span style="color:#57606a">.env</span>          ← IBM API keys, DB URL, JWT secret
+  </div>
+
+  
+  <h2>User Roles</h2>
+  <div class="role-grid">
+    <div class="role-card teacher">
+      <div class="role-title">Teacher <span>TCH-1001</span></div>
+      <ul>
+        <li>Create and manage classes</li>
+        <li>Add / remove students</li>
+        <li>Create and assign tasks</li>
+        <li>Review submissions</li>
+        <li>View class performance &amp; analytics</li>
+        <li>Monitor attendance &amp; streaks</li>
+        <li>Use AI to generate content</li>
+        <li>Approve or reject AI suggestions</li>
+        <li>See at-risk student alerts</li>
+        <li>Trigger intervention tasks</li>
+      </ul>
+    </div>
+    <div class="role-card student">
+      <div class="role-title">Student <span>STD-2054</span></div>
+      <ul>
+        <li>Join class via code</li>
+        <li>View assigned tasks</li>
+        <li>Submit assignments</li>
+        <li>Take assessments (MCQ / T-F / Short)</li>
+        <li>View scores and AI feedback</li>
+        <li>Track learning streak</li>
+        <li>View weak topics</li>
+        <li>Receive personalized recommendations</li>
+        <li>Access learning resources</li>
+        <li>See progress over time</li>
+      </ul>
+    </div>
+  </div>
+  <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:10px 16px;font-size:12.5px;color:#57606a;margin-bottom:24px">
+    <strong style="color:#1f2328">Admin</strong> — manages users, roles, system configuration. Implemented in Phase 3 alongside auth.
+  </div>
+
+  
+  <h2>Core Database Models</h2>
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="name">User</div>
+      <div class="fields"><span>id</span><span>unique_id (TCH/STD)</span><span>name</span><span>email</span><span>password_hash</span><span>role</span><span>created_at</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Class</div>
+      <div class="fields"><span>id</span><span>class_id (CLS-1001)</span><span>name</span><span>subject</span><span>teacher_id</span><span>join_code</span><span>created_at</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Enrollment</div>
+      <div class="fields"><span>student_id</span><span>class_id</span><span>joined_at</span><span>status</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Task</div>
+      <div class="fields"><span>id</span><span>title</span><span>subject</span><span>topic</span><span>class_id</span><span>due_date</span><span>marks</span><span>ai_generated</span><span>approved</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">TaskSubmission</div>
+      <div class="fields"><span>id</span><span>task_id</span><span>student_id</span><span>answers</span><span>score</span><span>submitted_at</span><span>feedback</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Assessment</div>
+      <div class="fields"><span>id</span><span>title</span><span>class_id</span><span>type (MCQ/TF/Short)</span><span>questions</span><span>created_at</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">AssessmentResult</div>
+      <div class="fields"><span>id</span><span>student_id</span><span>assessment_id</span><span>score</span><span>topic_scores</span><span>feedback</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Attendance</div>
+      <div class="fields"><span>id</span><span>student_id</span><span>class_id</span><span>date</span><span>status (present/absent)</span><span>streak</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Performance</div>
+      <div class="fields"><span>student_id</span><span>subject</span><span>topic</span><span>avg_score</span><span>task_completion</span><span>trend</span><span>updated_at</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Recommendation</div>
+      <div class="fields"><span>id</span><span>student_id</span><span>topic</span><span>resources</span><span>generated_at</span><span>status</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">LearningResource</div>
+      <div class="fields"><span>id</span><span>title</span><span>topic</span><span>subject</span><span>difficulty</span><span>source</span><span>url</span><span>language</span></div>
+    </div>
+    <div class="model-card">
+      <div class="name">Notification</div>
+      <div class="fields"><span>id</span><span>user_id</span><span>type</span><span>message</span><span>read</span><span>created_at</span></div>
+    </div>
+  </div>
+
+  
+  <h2>21-Phase Implementation Plan</h2>
+  <table class="phase-table">
+    <thead>
+      <tr>
+        <th style="width:42px">#</th>
+        <th>Phase</th>
+        <th>Deliverables</th>
+        <th style="width:80px">Layer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="phase-num infra">1</span></td>
+        <td>
+          <div class="phase-name">Foundation</div>
+          <div class="phase-desc">Skeleton only — no AI, no auth</div>
+        </td>
+        <td>React app + routing + layout shells. FastAPI app + health endpoint + CORS. Folder structure: frontend / backend / ai / database / tests. .env with DB URL, IBM keys.</td>
+        <td><span class="badge foundation">Infra</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num infra">2</span></td>
+        <td>
+          <div class="phase-name">Database</div>
+          <div class="phase-desc">All tables, relationships, migrations</div>
+        </td>
+        <td>SQLAlchemy models for all 12 entities. Alembic migrations. Seed data (sample teacher, student, class). Relationship: Teacher → Class → Enrollment → Student.</td>
+        <td><span class="badge foundation">Infra</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">3</span></td>
+        <td>
+          <div class="phase-name">Authentication</div>
+          <div class="phase-desc">Register, login, JWT, role routing</div>
+        </td>
+        <td>Register/Login endpoints. Bcrypt password hashing. JWT access tokens. Role-based route guards (React). Auto-redirect: Teacher → Teacher Dashboard, Student → Student Dashboard. Unique ID generation (TCH-XXXX / STD-XXXX).</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">4</span></td>
+        <td>
+          <div class="phase-name">Class Management</div>
+          <div class="phase-desc">Create class, join code, student enrollment</div>
+        </td>
+        <td>Teacher: create class → auto-generate Class ID (CLS-1001) + join code (SCI7A24). Student: enter join code → enrolled in class. Teacher: view class list with student count. Remove student from class. Subject association.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">5</span></td>
+        <td>
+          <div class="phase-name">Student Management</div>
+          <div class="phase-desc">Student profiles, teacher's student list</div>
+        </td>
+        <td>Teacher views full student list per class (name, score, attendance, tasks). Clicking a student opens profile: performance per subject, weak topics, task history, recent assessments. Student sees: enrolled classes, teacher name, their own profile data.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">6</span></td>
+        <td>
+          <div class="phase-name">Teacher Dashboard</div>
+          <div class="phase-desc">Real data control center</div>
+        </td>
+        <td>My Classes list. Overview: total students, average score, attendance %, pending tasks, students needing support count. Per-class view: avg score, attendance, task completion, strong topic, weak topic. "N students need attention" alert with drill-down.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">7</span></td>
+        <td>
+          <div class="phase-name">Student Dashboard</div>
+          <div class="phase-desc">Engaging learning home</div>
+        </td>
+        <td>Greeting + learning streak (🔥 N Days). Enrolled class info + teacher name. Today's tasks with status badges. Progress bar (overall %). Weak topics list. Recommended content preview. LeetCode-style feel.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">8</span></td>
+        <td>
+          <div class="phase-name">Task System</div>
+          <div class="phase-desc">Create, assign, submit tasks</div>
+        </td>
+        <td>Teacher manually creates task (title, subject, topic, due date, marks). Assign to class. Students see task in dashboard. Student submits answers. Submission stored with timestamp. Teacher sees: assigned / submitted / pending counts + average score per task. AI draft flow (placeholder, wired in Phase 13).</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">9</span></td>
+        <td>
+          <div class="phase-name">Assessment Engine</div>
+          <div class="phase-desc">MCQ, True/False, Short Answer</div>
+        </td>
+        <td>Question model with type field. MCQ / True-False scored deterministically in code (no AI). Short answers stored for AI feedback (Phase 14). Score calculated, stored in AssessmentResult. Topic-level score breakdown. Student sees: score, correct/wrong, weak area. Teacher sees: class score distribution per topic.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">10</span></td>
+        <td>
+          <div class="phase-name">Attendance &amp; Activity</div>
+          <div class="phase-desc">Daily tracker, learning streak</div>
+        </td>
+        <td>Daily present/absent tracking. Learning streak calculation (consecutive active days). Activity counters: tasks completed, quizzes completed, learning time. Calendar heatmap on student dashboard (month view). Teacher sees per-student: attendance %, streak, task completion %.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">11</span></td>
+        <td>
+          <div class="phase-name">Analytics</div>
+          <div class="phase-desc">Performance data foundation for AI</div>
+        </td>
+        <td>Student analytics: avg score, subject scores, topic scores, trend over time, weak/strong topics. Class analytics: class average, per-topic breakdown (strong/average/needs support counts), attendance and task completion rates. Performance model updated after every submission. This data feeds all AI agents.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">12</span></td>
+        <td>
+          <div class="phase-name">AI Teacher Assistant</div>
+          <div class="phase-desc">IBM Granite — class-aware chat</div>
+        </td>
+        <td>Teacher types natural language queries. Granite receives class context (subject, topic, recent scores, weak areas) alongside prompt. Responses: lesson ideas, explanations, weak student list, remedial suggestions. Single assistant first — no multi-agent yet. IBM watsonx.ai SDK integration.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">13</span></td>
+        <td>
+          <div class="phase-name">AI Content Generation</div>
+          <div class="phase-desc">Lessons, worksheets, quizzes via Granite</div>
+        </td>
+        <td>Structured prompts: class, subject, topic, difficulty, duration. Granite outputs: learning objectives, explanation, activity, questions, homework. Teacher reviews draft → Approve &amp; Assign / Edit / Reject. No automatic assignment — teacher must approve. Generated task saved with ai_generated=true flag.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">14</span></td>
+        <td>
+          <div class="phase-name">AI Assessment Feedback</div>
+          <div class="phase-desc">Short answer evaluation + explanations</div>
+        </td>
+        <td>Student short-answer → Granite evaluates → identifies mistake → generates explanation feedback. Score stored. Feedback shown to student post-submission. MCQ/TF continue to use deterministic scoring. Feedback also surfaced in teacher's submission review.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">15</span></td>
+        <td>
+          <div class="phase-name">Personalized Recommendations</div>
+          <div class="phase-desc">Student-specific learning paths</div>
+        </td>
+        <td>Input: student profile + assessment results + task history + topic performance. Granite generates: ordered learning path (e.g. Fractions Basics → Equivalent Fractions → Quiz). Resources matched from LearningResource table. Displayed on student dashboard. Refreshed after each new assessment.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">16</span></td>
+        <td>
+          <div class="phase-name">At-Risk Student Detection</div>
+          <div class="phase-desc">Rule + AI flagging for teacher</div>
+        </td>
+        <td>Rules: score declining + low task completion + poor attendance → flag. Status: 🟢 Normal / 🟡 Needs Attention / 🔴 High Support. AI generates reason sentence (not a label — a support signal for the teacher). Arjun example: 48% score, 82% attendance, 52% tasks → 🔴 + suggested action. Teacher sees list, not automatic action.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num core">17</span></td>
+        <td>
+          <div class="phase-name">Learning Resources</div>
+          <div class="phase-desc">IBM SkillsBuild + OER + teacher resources</div>
+        </td>
+        <td>Resource catalog: title, topic, subject, difficulty, source, language, URL. Teacher can add custom resources. AI recommendation links resources to weak topics. Student sees resource list in dashboard and in recommendation path. Filter by topic/difficulty/language.</td>
+        <td><span class="badge core">Core</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">18</span></td>
+        <td>
+          <div class="phase-name">Teacher Intervention Workflow</div>
+          <div class="phase-desc">Main Agentic AI demo workflow</div>
+        </td>
+        <td>AI detects weak topic in class → Teacher dashboard shows insight → Teacher views affected students → AI suggests remedial task → Teacher approves → Task assigned → Students complete → New assessment → Performance updated. This is the core demo story covering all modules end-to-end.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num ai">19</span></td>
+        <td>
+          <div class="phase-name">AI Agent Integration</div>
+          <div class="phase-desc">Wire all agents into service layer</div>
+        </td>
+        <td>AI Service Layer routes requests to: Lesson &amp; Content Agent, Assessment &amp; Feedback Agent, Performance &amp; Analytics Agent, Recommendation Agent. Each agent has defined input/output schema. No orchestrator yet — direct routing. All agents share class/student context from backend.</td>
+        <td><span class="badge ai">AI</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num infra">20</span></td>
+        <td>
+          <div class="phase-name">Security &amp; Testing</div>
+          <div class="phase-desc">Authorization, validation, test coverage</div>
+        </td>
+        <td>Route authorization (teacher can't access other teacher's class). Input validation on all endpoints. JWT expiry + refresh. AI prompt injection hardening. Unit tests: models, scoring logic, streak calculation. Integration tests: auth flow, task submission, assessment scoring. AI tests: output format validation.</td>
+        <td><span class="badge foundation">Infra</span></td>
+      </tr>
+      <tr>
+        <td><span class="phase-num infra">21</span></td>
+        <td>
+          <div class="phase-name">Deployment &amp; Demo</div>
+          <div class="phase-desc">IBM Cloud + final demo flow</div>
+        </td>
+        <td>IBM Cloud deployment (Code Engine / IKS). Environment variables for prod. DB migrations on deploy. Demo script: Teacher login → create class → students join → AI generates task → teacher approves → students submit → AI detects weakness → teacher intervenes → performance improves. Seed realistic demo data.</td>
+        <td><span class="badge deploy">Deploy</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  
+  <h2>AI Agent Architecture</h2>
+  <div class="agent-box">
+    <div class="agent-root"><span class="node">SHIKSHAFLOW AI</span></div>
+    <div class="vert-line">│</div>
+    <div style="display:flex;justify-content:center">
+      <div class="agent-node" style="background:#1f2328;color:#fff;border-color:#1f2328;font-weight:700">AI Teacher Assistant<br /><span style="font-size:10px;font-weight:400;color:#aaa">IBM Granite — class-aware</span></div>
+    </div>
+    <div class="vert-line">│</div>
+    <div class="agent-tier">
+      <div class="agent-node">Lesson &amp; Content<br />Agent</div>
+      <div class="agent-node">Assessment &amp;<br />Feedback Agent</div>
+      <div class="agent-node purple">Performance &amp;<br />Analytics Agent</div>
+    </div>
+    <div class="vert-line">│</div>
+    <div style="display:flex;justify-content:center">
+      <div class="agent-node green" style="min-width:160px">Personalized Learning<br />Recommendation Agent</div>
+    </div>
+    <div class="vert-line">│</div>
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+      <div class="agent-node" style="min-width:100px;font-size:11.5px">IBM Granite<br />LLM</div>
+      <div class="agent-node" style="min-width:100px;font-size:11.5px">IBM SkillsBuild<br />Resources</div>
+      <div class="agent-node" style="min-width:100px;font-size:11.5px">OER<br />Resources</div>
+    </div>
+    <div style="margin-top:12px;font-size:11.5px;color:#57606a;text-align:center">Orchestrator added only if needed in Phase 19. Start with direct routing.</div>
+  </div>
+
+  
+  <h2>Key Workflows</h2>
+
+  <div class="workflow-block">
+    <div class="wf-title">1 — Teacher creates AI-generated task</div>
+    <div class="wf-steps">
+      <span class="ws">Teacher</span><span class="wa">→</span>
+      <span class="ws">Ask AI for task</span><span class="wa">→</span>
+      <span class="ws ai">Granite generates draft</span><span class="wa">→</span>
+      <span class="ws highlight">Teacher reviews</span><span class="wa">→</span>
+      <span class="ws highlight">Approve / Edit / Reject</span><span class="wa">→</span>
+      <span class="ws">Assigned to class</span><span class="wa">→</span>
+      <span class="ws">Students receive task</span>
+    </div>
+  </div>
+
+  <div class="workflow-block">
+    <div class="wf-title">2 — Student completes task + gets feedback</div>
+    <div class="wf-steps">
+      <span class="ws">Student</span><span class="wa">→</span>
+      <span class="ws">Opens task</span><span class="wa">→</span>
+      <span class="ws">Submits answers</span><span class="wa">→</span>
+      <span class="ws">MCQ/TF scored in code</span><span class="wa">→</span>
+      <span class="ws ai">Short answers → Granite feedback</span><span class="wa">→</span>
+      <span class="ws">Score + weak area shown</span><span class="wa">→</span>
+      <span class="ws">Performance updated</span>
+    </div>
+  </div>
+
+  <div class="workflow-block">
+    <div class="wf-title">3 — Teacher Intervention (Main Demo Flow)</div>
+    <div class="wf-steps">
+      <span class="ws ai">AI detects weak topic</span><span class="wa">→</span>
+      <span class="ws highlight">Teacher dashboard alert</span><span class="wa">→</span>
+      <span class="ws">Teacher views students</span><span class="wa">→</span>
+      <span class="ws ai">AI suggests remedial task</span><span class="wa">→</span>
+      <span class="ws highlight">Teacher approves</span><span class="wa">→</span>
+      <span class="ws">Students get task</span><span class="wa">→</span>
+      <span class="ws">Students submit</span><span class="wa">→</span>
+      <span class="ws">New assessment</span><span class="wa">→</span>
+      <span class="ws">Performance improves</span><span class="wa">→</span>
+      <span class="ws highlight">Teacher sees progress</span>
+    </div>
+  </div>
+
+  <div class="workflow-block">
+    <div class="wf-title">4 — Student joins class</div>
+    <div class="wf-steps">
+      <span class="ws">Student registers</span><span class="wa">→</span>
+      <span class="ws">Enters join code (SCI7A24)</span><span class="wa">→</span>
+      <span class="ws">Matched to CLS-1001</span><span class="wa">→</span>
+      <span class="ws">Enrollment record created</span><span class="wa">→</span>
+      <span class="ws">Student dashboard shows class + teacher</span>
+    </div>
+  </div>
+
+  
+  <h2>Design Principles</h2>
+  <div class="callout">
+    <strong>Teacher always in control.</strong> AI never auto-assigns tasks or labels students. Every AI action requires teacher review and approval before reaching students.
+  </div>
+  <div class="callout purple">
+    <strong>MCQ and True/False scoring is deterministic code</strong> — never ask the LLM to calculate marks. Granite is used only for: content generation, short-answer evaluation, analysis, and recommendations.
+  </div>
+  <div class="callout green">
+    <strong>Build one phase at a time.</strong> Each phase produces a working, testable module. No AI until Phase 12. No multi-agent architecture until Phase 19. Complexity grows incrementally.
+  </div>
+
+  
+  <h2>IBM Bob Execution Order</h2>
+  <div class="flow-box">
+    <div class="flow-chain">
+      <span class="step">01 Foundation</span><span class="arrow">→</span>
+      <span class="step">02 Database</span><span class="arrow">→</span>
+      <span class="step">03 Auth</span><span class="arrow">→</span>
+      <span class="step">04 Class Mgmt</span><span class="arrow">→</span>
+      <span class="step">05 Student Mgmt</span><span class="arrow">→</span>
+      <span class="step">06 Teacher Dashboard</span><span class="arrow">→</span>
+      <span class="step">07 Student Dashboard</span><span class="arrow">→</span>
+      <span class="step">08 Tasks</span><span class="arrow">→</span>
+      <span class="step">09 Assessments</span><span class="arrow">→</span>
+      <span class="step">10 Attendance</span><span class="arrow">→</span>
+      <span class="step">11 Analytics</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">12 AI Assistant</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">13 AI Content</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">14 AI Feedback</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">15 Recommendations</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">16 Support Detection</span><span class="arrow">→</span>
+      <span class="step">17 Resources</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">18 Intervention</span><span class="arrow">→</span>
+      <span class="step" style="background:#f3f0ff;border-color:#ddd6fe;color:#7c5cd8">19 AI Integration</span><span class="arrow">→</span>
+      <span class="step">20 Security &amp; Testing</span><span class="arrow">→</span>
+      <span class="step">21 Deployment</span>
+    </div>
+    <div style="margin-top:12px;font-size:11.5px;color:#57606a">
+      <span style="background:#f3f0ff;border:1px solid #ddd6fe;color:#7c5cd8;padding:1px 7px;border-radius:3px;font-size:11px">Purple</span> = IBM Granite AI phases  |  Send one phase at a time to IBM Bob.
+    </div>
+  </div>
+
+  
+  <div class="footer">Made with IBM Bob</div>
+</div>
+</body>
+</html>
