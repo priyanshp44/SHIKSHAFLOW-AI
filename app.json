@@ -1,0 +1,303 @@
+{
+  "app": {
+    "name": "ShikshaFlow AI",
+    "version": "1.0.0",
+    "description": "An AI-powered personalized learning and teacher assistant platform that connects teachers, classes, and students through a centralized learning system, powered by Langflow and IBM Granite.",
+    "tagline": "Empowering teachers. Personalizing learning. Transforming education.",
+    "category": "EdTech / AI-Powered Learning Platform",
+    "team": "ShikshaFlow AI Team",
+    "event": "IBM Hackathon",
+    "repository": "https://github.com/your-team/shikshaflow-ai",
+    "license": "MIT"
+  },
+
+  "technology_stack": {
+    "frontend": {
+      "framework": "React",
+      "description": "Responsive dashboards for Teacher and Student roles"
+    },
+    "backend": {
+      "framework": "FastAPI",
+      "language": "Python",
+      "description": "REST API server handling authentication, class management, tasks, assessments, attendance, performance, and AI communication"
+    },
+    "database": {
+      "type": "Relational Database",
+      "engine": "PostgreSQL",
+      "description": "Stores all user, class, task, assessment, attendance, performance, and recommendation data"
+    },
+    "ai_orchestration": {
+      "platform": "Langflow",
+      "description": "Visual AI pipeline orchestration — routes requests through specialized agents, loads context data, and builds prompts for IBM Granite"
+    },
+    "llm": {
+      "model": "IBM Granite 3.2-8B-Instruct",
+      "provider": "IBM Cloud / IBM Watsonx",
+      "description": "Central large language model used for reasoning, content generation, feedback, performance analysis, and personalized recommendations"
+    },
+    "cloud": "IBM Cloud",
+    "learning_resources": [
+      "IBM SkillsBuild",
+      "Open Educational Resources (OER)",
+      "Teacher-Created Resources"
+    ]
+  },
+
+  "user_roles": [
+    {
+      "role": "Admin",
+      "permissions": [
+        "Platform management",
+        "User oversight",
+        "System configuration"
+      ]
+    },
+    {
+      "role": "Teacher",
+      "permissions": [
+        "Create and manage classes",
+        "Add or remove students via Join Code",
+        "Create and assign tasks and assessments",
+        "Review and approve AI-generated content",
+        "Monitor student attendance and performance",
+        "Trigger student interventions",
+        "Use AI Teacher Assistant"
+      ]
+    },
+    {
+      "role": "Student",
+      "permissions": [
+        "Join class using Join Code",
+        "View and complete assigned tasks",
+        "Take assessments",
+        "View scores and AI feedback",
+        "Track attendance and learning streak",
+        "Receive personalized AI learning recommendations"
+      ]
+    }
+  ],
+
+  "core_features": [
+    {
+      "id": "class_management",
+      "name": "Class Management",
+      "description": "Teachers create classes with a unique Join Code. Students enroll using the code. Each class has a subject, grade, teacher, student list, tasks, assessments, and performance data."
+    },
+    {
+      "id": "task_assessment",
+      "name": "Task and Assessment System",
+      "description": "Supports MCQ, True/False, and Short Answer formats. MCQ and True/False are auto-graded by the backend. Short Answer evaluation is handled by IBM Granite via Langflow.",
+      "grading": {
+        "mcq": "Backend deterministic auto-grading",
+        "true_false": "Backend deterministic auto-grading",
+        "short_answer": "IBM Granite via Langflow"
+      }
+    },
+    {
+      "id": "ai_task_approval",
+      "name": "AI-Generated Task Approval Gate",
+      "description": "AI can generate task drafts but CANNOT assign tasks automatically. Teacher must review and explicitly approve before any AI-generated task is assigned to students.",
+      "flow": [
+        "Teacher requests AI task",
+        "IBM Granite generates draft via Langflow",
+        "Teacher reviews draft on dashboard",
+        "Teacher approves",
+        "Task assigned to class or student"
+      ]
+    },
+    {
+      "id": "attendance_tracking",
+      "name": "Attendance and Learning Activity Tracking",
+      "description": "Daily attendance is recorded per student per class. Learning activity is tracked in a LeetCode-style streak model — Student → Daily Activity → Learning Streak → Progress."
+    },
+    {
+      "id": "performance_analytics",
+      "name": "Performance Analytics",
+      "description": "Tracks student scores per topic, identifies weak and strong areas, monitors trends, and flags students needing teacher attention. Powered by IBM Granite via Langflow."
+    },
+    {
+      "id": "personalized_learning",
+      "name": "Personalized Learning Path",
+      "description": "Based on student assessment results, task history, topic performance, and learning activity, the AI generates a personalized topic sequence and practice path.",
+      "example_path": [
+        "Fractions Basics",
+        "Equivalent Fractions",
+        "Comparing Fractions",
+        "Practice Quiz"
+      ]
+    },
+    {
+      "id": "teacher_intervention_loop",
+      "name": "Teacher Intervention Loop (Agentic AI Cycle)",
+      "description": "The core agentic loop of the platform. AI detects weak topics and struggling students after assessments, alerts the teacher, suggests remedial tasks, waits for teacher approval, assigns the task, and tracks improvement.",
+      "flow": [
+        "Assessment completed",
+        "Performance data updated",
+        "AI Performance Analytics Agent analyzes results",
+        "Weak topics and struggling students flagged",
+        "Teacher Dashboard alert triggered",
+        "AI suggests remedial task draft",
+        "Teacher reviews and approves",
+        "Task assigned to student",
+        "Student completes task",
+        "New assessment taken",
+        "Score updated",
+        "Teacher sees improvement"
+      ]
+    },
+    {
+      "id": "learning_resource_recommendation",
+      "name": "Learning Resource Recommendation",
+      "description": "Recommends learning resources from IBM SkillsBuild, OER, and teacher-uploaded content based on student, subject, topic, and difficulty level."
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "teacher_notifications": [
+        "Students needing support",
+        "Pending task approvals",
+        "Low assessment performance alerts",
+        "Class improvement updates"
+      ],
+      "student_notifications": [
+        "New task assigned",
+        "Assessment result available",
+        "AI recommendation ready",
+        "Learning streak alert"
+      ]
+    }
+  ],
+
+  "ai_service": {
+    "platform": "Langflow",
+    "pipeline": [
+      {
+        "step": 1,
+        "component": "Chat Input",
+        "description": "Receives teacher or student query along with user ID"
+      },
+      {
+        "step": 2,
+        "component": "AI Agent / Intent Router",
+        "description": "Classifies the request type and routes it to the appropriate specialized agent"
+      },
+      {
+        "step": 3,
+        "component": "File / Data Component",
+        "description": "Loads relevant student, class, performance, and task context data from the backend"
+      },
+      {
+        "step": 4,
+        "component": "Prompt Template",
+        "description": "Combines role instruction, user query, and loaded context into a structured prompt"
+      },
+      {
+        "step": 5,
+        "component": "IBM Granite 3.2-8B-Instruct",
+        "description": "Processes the prompt and generates the AI response",
+        "hosted_on": "IBM Cloud"
+      },
+      {
+        "step": 6,
+        "component": "JSON Parser / Validator",
+        "description": "Validates and structures the AI output into a consistent JSON format"
+      },
+      {
+        "step": 7,
+        "component": "Chat Output",
+        "description": "Returns the structured AI response to the FastAPI backend, which forwards it to the frontend"
+      }
+    ],
+    "specialized_agents": [
+      {
+        "name": "AI Teacher Assistant Agent",
+        "purpose": "Answers teacher queries using real class and student data"
+      },
+      {
+        "name": "Lesson and Content Generation Agent",
+        "purpose": "Generates lesson plans and study material for a given grade, subject, and topic"
+      },
+      {
+        "name": "Assessment and Feedback Agent",
+        "purpose": "Generates questions and evaluates short-answer responses with feedback"
+      },
+      {
+        "name": "Performance Analytics Agent",
+        "purpose": "Analyzes student and class performance data to identify weak topics, trends, and students needing support"
+      },
+      {
+        "name": "Personalized Learning Recommendation Agent",
+        "purpose": "Generates a personalized topic sequence and learning path for a student"
+      },
+      {
+        "name": "Student Support and Intervention Agent",
+        "purpose": "Generates remedial tasks and support content for struggling students"
+      },
+      {
+        "name": "Learning Resource Recommendation Agent",
+        "purpose": "Recommends relevant learning resources from IBM SkillsBuild, OER, and teacher-created content"
+      }
+    ]
+  },
+
+  "api_endpoints_overview": {
+    "base_url": "/api/v1",
+    "auth": [
+      { "method": "POST", "path": "/auth/register", "description": "Register new user" },
+      { "method": "POST", "path": "/auth/login",    "description": "Login and receive JWT token" },
+      { "method": "POST", "path": "/auth/logout",   "description": "Logout user" }
+    ],
+    "classes": [
+      { "method": "POST",   "path": "/classes",               "description": "Teacher creates a new class" },
+      { "method": "GET",    "path": "/classes/{class_id}",    "description": "Get class details" },
+      { "method": "POST",   "path": "/classes/join",          "description": "Student joins class using Join Code" },
+      { "method": "DELETE", "path": "/classes/{class_id}/students/{student_id}", "description": "Remove student from class" }
+    ],
+    "tasks": [
+      { "method": "POST", "path": "/tasks",                   "description": "Teacher creates a task" },
+      { "method": "GET",  "path": "/tasks/{task_id}",         "description": "Get task details" },
+      { "method": "POST", "path": "/tasks/{task_id}/submit",  "description": "Student submits task" },
+      { "method": "POST", "path": "/tasks/{task_id}/approve", "description": "Teacher approves AI-generated task" }
+    ],
+    "assessments": [
+      { "method": "POST", "path": "/assessments",                        "description": "Teacher creates assessment" },
+      { "method": "POST", "path": "/assessments/{assessment_id}/submit", "description": "Student submits assessment" },
+      { "method": "GET",  "path": "/assessments/{assessment_id}/results","description": "Get assessment results" }
+    ],
+    "attendance": [
+      { "method": "POST", "path": "/attendance",                            "description": "Mark attendance for a class session" },
+      { "method": "GET",  "path": "/attendance/student/{student_id}",       "description": "Get student attendance record" },
+      { "method": "GET",  "path": "/attendance/class/{class_id}",           "description": "Get class attendance summary" }
+    ],
+    "performance": [
+      { "method": "GET", "path": "/performance/student/{student_id}",  "description": "Get student performance summary" },
+      { "method": "GET", "path": "/performance/class/{class_id}",      "description": "Get class performance overview" }
+    ],
+    "ai": [
+      { "method": "POST", "path": "/ai/teacher-query",       "description": "Teacher sends query to AI Teacher Assistant" },
+      { "method": "POST", "path": "/ai/generate-task",       "description": "Request AI to generate a task draft" },
+      { "method": "POST", "path": "/ai/generate-lesson",     "description": "Request AI to generate a lesson plan" },
+      { "method": "POST", "path": "/ai/performance-analysis","description": "Request AI performance analysis for a class or student" },
+      { "method": "POST", "path": "/ai/recommendations",     "description": "Get personalized learning recommendations for a student" }
+    ]
+  },
+
+  "database_entities": [
+    "User", "Teacher", "Student", "Class", "Enrollment",
+    "Subject", "Topic", "Task", "TaskSubmission",
+    "Assessment", "Question", "Answer", "AssessmentResult",
+    "Attendance", "LearningActivity", "Performance",
+    "LearningResource", "Recommendation", "LessonPlan", "Feedback"
+  ],
+
+  "architecture_layers": {
+    "layer_1_users":     "Teacher / Student / Admin",
+    "layer_2_frontend":  "React — Teacher Dashboard and Student Dashboard",
+    "layer_3_backend":   "FastAPI / Python — Auth, Class, Task, Assessment, Attendance, Performance, AI Connector",
+    "layer_4_database":  "PostgreSQL — All application data",
+    "layer_5_ai_service":"Langflow — Intent Router, Data Component, Prompt Template, Specialized Agents",
+    "layer_6_llm":       "IBM Granite 3.2-8B-Instruct on IBM Cloud",
+    "layer_7_resources": "IBM SkillsBuild, OER, Teacher-Created Content",
+    "layer_8_output":    "AI Feedback, Recommendations, Task Drafts, Lesson Plans, Teacher Insights"
+  }
+}
