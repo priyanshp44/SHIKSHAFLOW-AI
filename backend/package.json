@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@ibm-cloud/watsonx-ai": "^1.7.16"
+  }
+}
